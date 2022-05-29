@@ -36,6 +36,7 @@ public class SigninActivity extends AppCompatActivity {
     private DatabaseReference mRootRef;
     private FirebaseAuth mAuth;
 
+
     ProgressDialog pd;
 
     @Override
@@ -73,14 +74,16 @@ public class SigninActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(txtName) || TextUtils.isEmpty(txtEmail) || TextUtils.isEmpty(txtPassword) || TextUtils.isEmpty(txtPasswordAgain)){
                     Toast.makeText(SigninActivity.this, " All Fields Are Mandatory! ", Toast.LENGTH_SHORT).show();
-                } else if ( txtPassword != txtPasswordAgain ){
+                } else if ( !txtPasswordAgain .equals(txtPassword ) ){
                     Toast.makeText(SigninActivity.this, " PasswordS not match! ", Toast.LENGTH_SHORT).show();
+
                 }
 //                else if (txtPassword.length() < 6){
 //                    Toast.makeText(SigninActivity.this, "Password too short!", Toast.LENGTH_SHORT).show();
 //                }
                 else {
                     registerUser( txtName , txtEmail , txtPassword);
+                    //Toast.makeText(SigninActivity.this, " PasswordS is match! ", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -99,7 +102,6 @@ public class SigninActivity extends AppCompatActivity {
                 map.put("name" , name);
                 map.put("email", email);
                 map.put("id" , mAuth.getCurrentUser().getUid());
-                map.put("bio" , "");
                 map.put("imageurl" , "default");
 
                 mRootRef.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
