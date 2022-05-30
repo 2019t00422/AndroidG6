@@ -2,96 +2,69 @@ package com.example.androidg6;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
+    BottomNavigationView bottomNav;
+    private FirebaseAuth mAuth;
 
-    //private Button button;
-    //private TextView textView;
-
-    BottomNavigationView bottomNavigationView;
-    Fragment selecterFragment = null;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        mAuth = FirebaseAuth.getInstance();
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-
-        Bundle intent = getIntent().getExtras();
-        if (intent != null){
-            String publisher = intent.getString("publisherid");
-
-            SharedPreferences.Editor editor = getSharedPreferences("PREFS" , MODE_PRIVATE).edit();
-            editor.putString("profileid" , publisher);
-            editor.apply();
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container , new ProfileFragment()).commit();
-        } else {
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container , new HomeFragment()).commit();
-
-        }
+        bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null){
+            startActivity(new Intent(MainActivity.this , LoginActivity.class));
+        }
+    }
+
+    private final BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
                     switch (menuItem.getItemId()) {
                         case R.id.nav_home:
-                            selecterFragment = new HomeFragment();
+                            //startActivity(new Intent(MainActivity.this , HomeActivity.class));
                             break;
 
                         case R.id.nav_search:
-                            selecterFragment = new SearchFragment();
+                           startActivity(new Intent(MainActivity.this , SearchActivity.class));
                             break;
 
-                        case R.id.nav_add:
-                            selecterFragment = null;
+                        case R.id.nav_post:
                             startActivity(new Intent(MainActivity.this , PostActivity.class));
                             break;
 
-                        case R.id.nav_heart:
-                            selecterFragment = new NotificationFragment();
+                        case R.id.nav_favorite:
+                            startActivity(new Intent(MainActivity.this , FavoriteActivity.class));
                             break;
 
                         case R.id.nav_profile:
-                            SharedPreferences.Editor editor = getSharedPreferences("PREFS" , MODE_PRIVATE).edit();
-                            editor.putString("profileid" , FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            editor.apply();
-                            selecterFragment = new ProfileFragment();
+                            startActivity(new Intent(MainActivity.this , ProfilActivity.class));
                             break;
-                    }
-
-                    if (selecterFragment != null){
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container , selecterFragment).commit();
                     }
 
                     return true;
                 }
             };
-
-
-
-
-
 
 
 }
